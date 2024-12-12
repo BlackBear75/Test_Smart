@@ -1,8 +1,15 @@
-﻿namespace Test_Smart.Models.PlacementContractModels;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Test_Smart.Models.PlacementContractModels;
 
 public class CreateContractRequest
 {
-    public Guid ProductionFacilityId { get; set; }
-    public Guid EquipmentTypeId { get; set; }
+    [Required]
+    public string ProductionFacilityCode { get; set; } 
+
+    [Required]
+    public string EquipmentTypeCode { get; set; } 
+
+    [Range(1, int.MaxValue)]
     public int Quantity { get; set; }
 }

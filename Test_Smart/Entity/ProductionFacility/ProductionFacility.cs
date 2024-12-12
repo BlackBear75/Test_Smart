@@ -7,8 +7,11 @@ public class ProductionFacility : Document
 {
     [Required]
     [MaxLength(100)]
-    public string Name { get; set; } = string.Empty;
+    public string Code { get; set; } 
 
-    [Range(0, double.MaxValue)]
-    public double StandardArea { get; set; } 
+    [Required]
+    [MaxLength(200)]
+    public string Name { get; set; }
+
+    public double StandardArea { get; set; }
 }

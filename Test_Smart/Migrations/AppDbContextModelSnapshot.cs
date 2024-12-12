@@ -31,6 +31,11 @@ namespace Test_Smart.Migrations
                     b.Property<double>("AreaPerUnit")
                         .HasColumnType("float");
 
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
@@ -42,8 +47,8 @@ namespace Test_Smart.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
@@ -52,17 +57,19 @@ namespace Test_Smart.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("ec80dcee-55c6-4763-9f74-4503a105e429"),
+                            Id = new Guid("fd5fbc9e-f75c-4de7-a45c-de3fadbb14b4"),
                             AreaPerUnit = 50.0,
-                            CreationDate = new DateTime(2024, 12, 12, 17, 9, 54, 910, DateTimeKind.Utc),
+                            Code = "EQ001",
+                            CreationDate = new DateTime(2024, 12, 12, 17, 47, 46, 300, DateTimeKind.Utc),
                             Deleted = false,
                             Name = "Machine A"
                         },
                         new
                         {
-                            Id = new Guid("9f9c6929-c8ed-49f3-9f2e-ff7280344589"),
+                            Id = new Guid("78e6bacc-22fe-4cc9-9e2b-b2fef1dc1b62"),
                             AreaPerUnit = 70.0,
-                            CreationDate = new DateTime(2024, 12, 12, 17, 9, 54, 910, DateTimeKind.Utc),
+                            Code = "EQ002",
+                            CreationDate = new DateTime(2024, 12, 12, 17, 47, 46, 300, DateTimeKind.Utc),
                             Deleted = false,
                             Name = "Machine B"
                         });
@@ -103,20 +110,20 @@ namespace Test_Smart.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("5539f319-bd82-4177-bff8-2cdd17dfa039"),
-                            CreationDate = new DateTime(2024, 12, 12, 17, 9, 54, 910, DateTimeKind.Utc),
+                            Id = new Guid("337cb304-09ae-4f46-973d-0718ef2a6e03"),
+                            CreationDate = new DateTime(2024, 12, 12, 17, 47, 46, 300, DateTimeKind.Utc),
                             Deleted = false,
-                            EquipmentTypeId = new Guid("ec80dcee-55c6-4763-9f74-4503a105e429"),
-                            ProductionFacilityId = new Guid("c46b2433-7736-4933-840b-82b0855779c8"),
+                            EquipmentTypeId = new Guid("fd5fbc9e-f75c-4de7-a45c-de3fadbb14b4"),
+                            ProductionFacilityId = new Guid("40d0a731-9c98-4126-9464-7a35100c59b8"),
                             Quantity = 10
                         },
                         new
                         {
-                            Id = new Guid("d56d9d17-8884-4c18-a524-5430b62d7edf"),
-                            CreationDate = new DateTime(2024, 12, 12, 17, 9, 54, 910, DateTimeKind.Utc),
+                            Id = new Guid("acaf647a-920b-4b88-95e5-4c76a990198c"),
+                            CreationDate = new DateTime(2024, 12, 12, 17, 47, 46, 300, DateTimeKind.Utc),
                             Deleted = false,
-                            EquipmentTypeId = new Guid("9f9c6929-c8ed-49f3-9f2e-ff7280344589"),
-                            ProductionFacilityId = new Guid("8e45e954-11b6-4431-9024-e79fa15a6465"),
+                            EquipmentTypeId = new Guid("78e6bacc-22fe-4cc9-9e2b-b2fef1dc1b62"),
+                            ProductionFacilityId = new Guid("5f29a2ec-2936-4720-938e-54022329593c"),
                             Quantity = 5
                         });
                 });
@@ -126,6 +133,11 @@ namespace Test_Smart.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
@@ -138,8 +150,8 @@ namespace Test_Smart.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<double>("StandardArea")
                         .HasColumnType("float");
@@ -151,16 +163,18 @@ namespace Test_Smart.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("c46b2433-7736-4933-840b-82b0855779c8"),
-                            CreationDate = new DateTime(2024, 12, 12, 17, 9, 54, 910, DateTimeKind.Utc),
+                            Id = new Guid("40d0a731-9c98-4126-9464-7a35100c59b8"),
+                            Code = "FAC001",
+                            CreationDate = new DateTime(2024, 12, 12, 17, 47, 46, 300, DateTimeKind.Utc),
                             Deleted = false,
                             Name = "Factory A",
                             StandardArea = 1000.0
                         },
                         new
                         {
-                            Id = new Guid("8e45e954-11b6-4431-9024-e79fa15a6465"),
-                            CreationDate = new DateTime(2024, 12, 12, 17, 9, 54, 910, DateTimeKind.Utc),
+                            Id = new Guid("5f29a2ec-2936-4720-938e-54022329593c"),
+                            Code = "FAC002",
+                            CreationDate = new DateTime(2024, 12, 12, 17, 47, 46, 300, DateTimeKind.Utc),
                             Deleted = false,
                             Name = "Factory B",
                             StandardArea = 800.0

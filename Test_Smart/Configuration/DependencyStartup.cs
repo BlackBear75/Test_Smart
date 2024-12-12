@@ -15,6 +15,7 @@ public static class DependencyStartup
         AddRepositories(builder.Services);
         AddInfrastructure(builder.Services);
         AddServices(builder.Services);
+        AddSwaggerGen(builder.Services);
     }
 
     private static void AddDbContext(IServiceCollection services, IConfiguration configuration)
@@ -33,6 +34,35 @@ public static class DependencyStartup
      
     }
 
+    public static void AddSwaggerGen(IServiceCollection services)
+    {
+        services.AddSwaggerGen(c =>
+        {
+            c.AddSecurityDefinition("ApiKey", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Description = "API Key must be provided in the header",
+                Name = "X-Api-Key",
+                In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+                Scheme = "ApiKey"
+            });
+
+            c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+            {
+                {
+                    new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                    {
+                        Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                        {
+                            Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                            Id = "ApiKey"
+                        }
+                    },
+                    Array.Empty<string>() // Порожній масив, бо ключ не залежить від ролей
+                }
+            });
+        });
+    }
     public static void AddServices(IServiceCollection services)
     {
         services.AddScoped<IPlacementContractService, PlacementContractService>();
@@ -43,6 +73,5 @@ public static class DependencyStartup
         services.AddAuthorization();
         services.AddControllers();
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
     }
 }

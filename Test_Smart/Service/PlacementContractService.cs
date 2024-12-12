@@ -34,13 +34,13 @@ public class PlacementContractService : IPlacementContractService
 
     public async Task CreateContractAsync(CreateContractRequest request)
     {
-        var facility = await _facilityRepository.FindByIdAsync(request.ProductionFacilityId);
+        var facility = await _facilityRepository.FindOneAsync(f => f.Code == request.ProductionFacilityCode);
         if (facility == null)
         {
             throw new InvalidOperationException("Production facility not found.");
         }
 
-        var equipment = await _equipmentRepository.FindByIdAsync(request.EquipmentTypeId);
+        var equipment = await _equipmentRepository.FindOneAsync(e => e.Code == request.EquipmentTypeCode);
         if (equipment == null)
         {
             throw new InvalidOperationException("Equipment type not found.");
@@ -48,7 +48,11 @@ public class PlacementContractService : IPlacementContractService
 
         var requiredArea = equipment.AreaPerUnit * request.Quantity;
 
-        var contractsInFacility = await _contractRepository.FilterByAsync(c => c.ProductionFacilityId == request.ProductionFacilityId);
+        var contractsInFacility = await _contractRepository.FilterByWithIncludesAsync(
+            c => c.ProductionFacilityId == facility.Id,
+            c => c.EquipmentType
+        );
+
         var usedArea = contractsInFacility.Sum(c => c.Quantity * c.EquipmentType.AreaPerUnit);
 
         if (usedArea + requiredArea > facility.StandardArea)
@@ -58,13 +62,14 @@ public class PlacementContractService : IPlacementContractService
 
         var contract = new PlacementContract
         {
-            ProductionFacilityId = request.ProductionFacilityId,
-            EquipmentTypeId = request.EquipmentTypeId,
+            ProductionFacilityId = facility.Id,
+            EquipmentTypeId = equipment.Id,
             Quantity = request.Quantity
         };
 
         await _contractRepository.InsertOneAsync(contract);
     }
+
 
     public async Task<IEnumerable<ContractResponse>> GetContractsAsync()
     {

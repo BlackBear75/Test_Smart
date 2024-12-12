@@ -18,7 +18,8 @@ namespace Test_Smart.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     AreaPerUnit = table.Column<double>(type: "float", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Deleted = table.Column<bool>(type: "bit", nullable: false),
@@ -34,7 +35,8 @@ namespace Test_Smart.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     StandardArea = table.Column<double>(type: "float", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Deleted = table.Column<bool>(type: "bit", nullable: false),
@@ -76,20 +78,20 @@ namespace Test_Smart.Migrations
 
             migrationBuilder.InsertData(
                 table: "EquipmentTypes",
-                columns: new[] { "Id", "AreaPerUnit", "CreationDate", "Deleted", "DeletionDate", "Name" },
+                columns: new[] { "Id", "AreaPerUnit", "Code", "CreationDate", "Deleted", "DeletionDate", "Name" },
                 values: new object[,]
                 {
-                    { new Guid("9f9c6929-c8ed-49f3-9f2e-ff7280344589"), 70.0, new DateTime(2024, 12, 12, 17, 9, 54, 910, DateTimeKind.Utc), false, null, "Machine B" },
-                    { new Guid("ec80dcee-55c6-4763-9f74-4503a105e429"), 50.0, new DateTime(2024, 12, 12, 17, 9, 54, 910, DateTimeKind.Utc), false, null, "Machine A" }
+                    { new Guid("78e6bacc-22fe-4cc9-9e2b-b2fef1dc1b62"), 70.0, "EQ002", new DateTime(2024, 12, 12, 17, 47, 46, 300, DateTimeKind.Utc), false, null, "Machine B" },
+                    { new Guid("fd5fbc9e-f75c-4de7-a45c-de3fadbb14b4"), 50.0, "EQ001", new DateTime(2024, 12, 12, 17, 47, 46, 300, DateTimeKind.Utc), false, null, "Machine A" }
                 });
 
             migrationBuilder.InsertData(
                 table: "ProductionFacilities",
-                columns: new[] { "Id", "CreationDate", "Deleted", "DeletionDate", "Name", "StandardArea" },
+                columns: new[] { "Id", "Code", "CreationDate", "Deleted", "DeletionDate", "Name", "StandardArea" },
                 values: new object[,]
                 {
-                    { new Guid("8e45e954-11b6-4431-9024-e79fa15a6465"), new DateTime(2024, 12, 12, 17, 9, 54, 910, DateTimeKind.Utc), false, null, "Factory B", 800.0 },
-                    { new Guid("c46b2433-7736-4933-840b-82b0855779c8"), new DateTime(2024, 12, 12, 17, 9, 54, 910, DateTimeKind.Utc), false, null, "Factory A", 1000.0 }
+                    { new Guid("40d0a731-9c98-4126-9464-7a35100c59b8"), "FAC001", new DateTime(2024, 12, 12, 17, 47, 46, 300, DateTimeKind.Utc), false, null, "Factory A", 1000.0 },
+                    { new Guid("5f29a2ec-2936-4720-938e-54022329593c"), "FAC002", new DateTime(2024, 12, 12, 17, 47, 46, 300, DateTimeKind.Utc), false, null, "Factory B", 800.0 }
                 });
 
             migrationBuilder.InsertData(
@@ -97,8 +99,8 @@ namespace Test_Smart.Migrations
                 columns: new[] { "Id", "CreationDate", "Deleted", "DeletionDate", "EquipmentTypeId", "ProductionFacilityId", "Quantity" },
                 values: new object[,]
                 {
-                    { new Guid("5539f319-bd82-4177-bff8-2cdd17dfa039"), new DateTime(2024, 12, 12, 17, 9, 54, 910, DateTimeKind.Utc), false, null, new Guid("ec80dcee-55c6-4763-9f74-4503a105e429"), new Guid("c46b2433-7736-4933-840b-82b0855779c8"), 10 },
-                    { new Guid("d56d9d17-8884-4c18-a524-5430b62d7edf"), new DateTime(2024, 12, 12, 17, 9, 54, 910, DateTimeKind.Utc), false, null, new Guid("9f9c6929-c8ed-49f3-9f2e-ff7280344589"), new Guid("8e45e954-11b6-4431-9024-e79fa15a6465"), 5 }
+                    { new Guid("337cb304-09ae-4f46-973d-0718ef2a6e03"), new DateTime(2024, 12, 12, 17, 47, 46, 300, DateTimeKind.Utc), false, null, new Guid("fd5fbc9e-f75c-4de7-a45c-de3fadbb14b4"), new Guid("40d0a731-9c98-4126-9464-7a35100c59b8"), 10 },
+                    { new Guid("acaf647a-920b-4b88-95e5-4c76a990198c"), new DateTime(2024, 12, 12, 17, 47, 46, 300, DateTimeKind.Utc), false, null, new Guid("78e6bacc-22fe-4cc9-9e2b-b2fef1dc1b62"), new Guid("5f29a2ec-2936-4720-938e-54022329593c"), 5 }
                 });
 
             migrationBuilder.CreateIndex(

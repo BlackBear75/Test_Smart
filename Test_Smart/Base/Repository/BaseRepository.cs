@@ -137,4 +137,19 @@ public class BaseRepository<TDocument> : IBaseRepository<TDocument> where TDocum
 
         return await query.ToListAsync();
     }
+    
+    public async Task<IEnumerable<TDocument>> FilterByWithIncludesAsync(
+        Expression<Func<TDocument, bool>> filterExpression,
+        params Expression<Func<TDocument, object>>[] includes)
+    {
+        IQueryable<TDocument> query = _context.Set<TDocument>().Where(filterExpression);
+
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+
+        return await query.ToListAsync();
+    }
+
 }

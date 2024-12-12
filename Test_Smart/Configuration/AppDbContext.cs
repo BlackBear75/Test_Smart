@@ -16,7 +16,6 @@ public class AppDbContext : DbContext
     public DbSet<EquipmentType> EquipmentTypes { get; set; }
     public DbSet<PlacementContract> PlacementContracts { get; set; }
        
-       
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -24,6 +23,7 @@ public class AppDbContext : DbContext
         var productionFacility1 = new ProductionFacility
         {
             Id = Guid.NewGuid(),
+            Code = "FAC001",
             Name = "Factory A",
             StandardArea = 1000
         };
@@ -31,6 +31,7 @@ public class AppDbContext : DbContext
         var productionFacility2 = new ProductionFacility
         {
             Id = Guid.NewGuid(),
+            Code = "FAC002", 
             Name = "Factory B",
             StandardArea = 800
         };
@@ -38,6 +39,7 @@ public class AppDbContext : DbContext
         var equipmentType1 = new EquipmentType
         {
             Id = Guid.NewGuid(),
+            Code = "EQ001", 
             Name = "Machine A",
             AreaPerUnit = 50
         };
@@ -45,6 +47,7 @@ public class AppDbContext : DbContext
         var equipmentType2 = new EquipmentType
         {
             Id = Guid.NewGuid(),
+            Code = "EQ002", 
             Name = "Machine B",
             AreaPerUnit = 70
         };
@@ -69,5 +72,4 @@ public class AppDbContext : DbContext
             }
         );
     }
-
 }
