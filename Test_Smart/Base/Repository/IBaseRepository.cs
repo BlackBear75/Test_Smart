@@ -10,6 +10,7 @@ public interface IBaseRepository<TDocument> where TDocument : Document
     Task UpdateOneAsync(TDocument document);
     Task DeleteOneAsync(Guid id);
    Task <string> GetConnectionString();
+   Task<IEnumerable<TDocument>> GetAllWithIncludesAsync( params Expression<Func<TDocument, object>>[] includes);
     Task<IEnumerable<TDocument>> GetWithSkipAsync(int skip, int take); 
     Task<IEnumerable<TDocument>> FilterByAsync(Expression<Func<TDocument, bool>> filterExpression);
 

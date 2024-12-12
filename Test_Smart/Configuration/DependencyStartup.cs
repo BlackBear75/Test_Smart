@@ -3,6 +3,7 @@ using Test_Smart.Base.Repository;
 using Test_Smart.Entity.EquipmentType.Repository;
 using Test_Smart.Entity.PlacementContract.Repository;
 using Test_Smart.Entity.ProductionFacility.Repository;
+using Test_Smart.Service;
 
 namespace Test_Smart.Configuration;
 
@@ -13,6 +14,7 @@ public static class DependencyStartup
         AddDbContext(builder.Services, builder.Configuration);
         AddRepositories(builder.Services);
         AddInfrastructure(builder.Services);
+        AddServices(builder.Services);
     }
 
     private static void AddDbContext(IServiceCollection services, IConfiguration configuration)
@@ -31,7 +33,11 @@ public static class DependencyStartup
      
     }
 
-
+    public static void AddServices(IServiceCollection services)
+    {
+        services.AddScoped<IPlacementContractService, PlacementContractService>();
+    
+    }
     private static void AddInfrastructure(IServiceCollection services)
     {
         services.AddAuthorization();

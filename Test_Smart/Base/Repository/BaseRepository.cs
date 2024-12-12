@@ -125,4 +125,16 @@ public class BaseRepository<TDocument> : IBaseRepository<TDocument> where TDocum
         }
         await _context.SaveChangesAsync();
     }
+    public async Task<IEnumerable<TDocument>> GetAllWithIncludesAsync(
+        params Expression<Func<TDocument, object>>[] includes)
+    {
+        IQueryable<TDocument> query = _context.Set<TDocument>();
+
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+
+        return await query.ToListAsync();
+    }
 }
