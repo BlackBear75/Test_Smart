@@ -124,13 +124,17 @@ public class PlacementContractService : IPlacementContractService
 
     private void ValidateAreaAvailability(ProductionFacility facility, double requiredArea, PlacementContract? existingContract)
     {
-        var contractsInFacility = _contractRepository.FilterByAsync(c => c.ProductionFacilityId == facility.Id).Result;
+        var contractsInFacility = _contractRepository.GetAllWithIncludesAsync(
+                c => c.EquipmentType
+            ).Result
+            .Where(c => c.ProductionFacilityId == facility.Id);
 
         var usedArea = contractsInFacility
             .Where(c => existingContract == null || c.Id != existingContract.Id)
-            .Sum(c => c.Quantity * c.EquipmentType.AreaPerUnit);
+            .Sum(c => c.EquipmentType?.AreaPerUnit * c.Quantity ?? 0);
 
         if (usedArea + requiredArea > facility.StandardArea)
             throw new InvalidOperationException("Not enough available area in the production facility.");
     }
+
 }

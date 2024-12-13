@@ -36,6 +36,14 @@ public class AppDbContext : DbContext
             StandardArea = 800
         };
 
+        var facility3 = new ProductionFacility
+        {
+            Id = Guid.NewGuid(),
+            Code = "FAC003",
+            Name = "Factory C",
+            StandardArea = 1200
+        };
+
         var equipment1 = new EquipmentType
         {
             Id = Guid.NewGuid(),
@@ -50,6 +58,22 @@ public class AppDbContext : DbContext
             Code = "EQ002",
             Name = "Machine B",
             AreaPerUnit = 70
+        };
+
+        var equipment3 = new EquipmentType
+        {
+            Id = Guid.NewGuid(),
+            Code = "EQ003",
+            Name = "Machine C",
+            AreaPerUnit = 30
+        };
+
+        var equipment4 = new EquipmentType
+        {
+            Id = Guid.NewGuid(),
+            Code = "EQ004",
+            Name = "Machine D",
+            AreaPerUnit = 90
         };
 
         var contract1 = new PlacementContract
@@ -68,8 +92,32 @@ public class AppDbContext : DbContext
             Quantity = 5
         };
 
-        modelBuilder.Entity<ProductionFacility>().HasData(facility1, facility2);
-        modelBuilder.Entity<EquipmentType>().HasData(equipment1, equipment2);
-        modelBuilder.Entity<PlacementContract>().HasData(contract1, contract2);
+        var contract3 = new PlacementContract
+        {
+            Id = Guid.NewGuid(),
+            ProductionFacilityId = facility3.Id,
+            EquipmentTypeId = equipment3.Id,
+            Quantity = 15
+        };
+
+        var contract4 = new PlacementContract
+        {
+            Id = Guid.NewGuid(),
+            ProductionFacilityId = facility1.Id,
+            EquipmentTypeId = equipment4.Id,
+            Quantity = 8
+        };
+
+        var contract5 = new PlacementContract
+        {
+            Id = Guid.NewGuid(),
+            ProductionFacilityId = facility2.Id,
+            EquipmentTypeId = equipment3.Id,
+            Quantity = 20
+        };
+
+        modelBuilder.Entity<ProductionFacility>().HasData(facility1, facility2, facility3);
+        modelBuilder.Entity<EquipmentType>().HasData(equipment1, equipment2, equipment3, equipment4);
+        modelBuilder.Entity<PlacementContract>().HasData(contract1, contract2, contract3, contract4, contract5);
     }
 }
