@@ -11,16 +11,16 @@ public class AppDbContext : DbContext
     {
         Database.EnsureCreated();
     }
-    
+
     public DbSet<ProductionFacility> ProductionFacilities { get; set; }
     public DbSet<EquipmentType> EquipmentTypes { get; set; }
     public DbSet<PlacementContract> PlacementContracts { get; set; }
-       
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        var productionFacility1 = new ProductionFacility
+        var facility1 = new ProductionFacility
         {
             Id = Guid.NewGuid(),
             Code = "FAC001",
@@ -28,48 +28,48 @@ public class AppDbContext : DbContext
             StandardArea = 1000
         };
 
-        var productionFacility2 = new ProductionFacility
+        var facility2 = new ProductionFacility
         {
             Id = Guid.NewGuid(),
-            Code = "FAC002", 
+            Code = "FAC002",
             Name = "Factory B",
             StandardArea = 800
         };
 
-        var equipmentType1 = new EquipmentType
+        var equipment1 = new EquipmentType
         {
             Id = Guid.NewGuid(),
-            Code = "EQ001", 
+            Code = "EQ001",
             Name = "Machine A",
             AreaPerUnit = 50
         };
 
-        var equipmentType2 = new EquipmentType
+        var equipment2 = new EquipmentType
         {
             Id = Guid.NewGuid(),
-            Code = "EQ002", 
+            Code = "EQ002",
             Name = "Machine B",
             AreaPerUnit = 70
         };
 
-        modelBuilder.Entity<ProductionFacility>().HasData(productionFacility1, productionFacility2);
-        modelBuilder.Entity<EquipmentType>().HasData(equipmentType1, equipmentType2);
+        var contract1 = new PlacementContract
+        {
+            Id = Guid.NewGuid(),
+            ProductionFacilityId = facility1.Id,
+            EquipmentTypeId = equipment1.Id,
+            Quantity = 10
+        };
 
-        modelBuilder.Entity<PlacementContract>().HasData(
-            new PlacementContract
-            {
-                Id = Guid.NewGuid(),
-                ProductionFacilityId = productionFacility1.Id,
-                EquipmentTypeId = equipmentType1.Id,
-                Quantity = 10
-            },
-            new PlacementContract
-            {
-                Id = Guid.NewGuid(),
-                ProductionFacilityId = productionFacility2.Id,
-                EquipmentTypeId = equipmentType2.Id,
-                Quantity = 5
-            }
-        );
+        var contract2 = new PlacementContract
+        {
+            Id = Guid.NewGuid(),
+            ProductionFacilityId = facility2.Id,
+            EquipmentTypeId = equipment2.Id,
+            Quantity = 5
+        };
+
+        modelBuilder.Entity<ProductionFacility>().HasData(facility1, facility2);
+        modelBuilder.Entity<EquipmentType>().HasData(equipment1, equipment2);
+        modelBuilder.Entity<PlacementContract>().HasData(contract1, contract2);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Test_Smart.BackgroundServices;
 using Test_Smart.Base.Repository;
 using Test_Smart.Entity.EquipmentType.Repository;
 using Test_Smart.Entity.PlacementContract.Repository;
@@ -16,6 +17,7 @@ public static class DependencyStartup
         AddInfrastructure(builder.Services);
         AddServices(builder.Services);
         AddSwaggerGen(builder.Services);
+        AddLogging(builder);
     }
 
     private static void AddDbContext(IServiceCollection services, IConfiguration configuration)
@@ -58,7 +60,7 @@ public static class DependencyStartup
                             Id = "ApiKey"
                         }
                     },
-                    Array.Empty<string>() // Порожній масив, бо ключ не залежить від ролей
+                    Array.Empty<string>() 
                 }
             });
         });
@@ -73,5 +75,16 @@ public static class DependencyStartup
         services.AddAuthorization();
         services.AddControllers();
         services.AddEndpointsApiExplorer();
+        services.AddSingleton<LoggerBackgroundService>();
+        services.AddHostedService(provider => provider.GetRequiredService<LoggerBackgroundService>());
+    }
+
+    private static void AddLogging(WebApplicationBuilder builder)
+    {
+        builder.Logging.ClearProviders();
+        builder.Logging.AddConsole();
+        builder.Logging.AddDebug();
+        builder.Logging.SetMinimumLevel(LogLevel.Information);
+
     }
 }
