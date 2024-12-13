@@ -68,6 +68,8 @@ public static class DependencyStartup
     public static void AddServices(IServiceCollection services)
     {
         services.AddScoped<IPlacementContractService, PlacementContractService>();
+        services.AddScoped<IEquipmentTypeService, EquipmentTypeService>();
+        services.AddScoped<IProductionFacilityService, ProductionFacilityService>();
     
     }
     private static void AddInfrastructure(IServiceCollection services)
@@ -75,6 +77,7 @@ public static class DependencyStartup
         services.AddAuthorization();
         services.AddControllers();
         services.AddEndpointsApiExplorer();
+        
         services.AddSingleton<LoggerBackgroundService>();
         services.AddHostedService(provider => provider.GetRequiredService<LoggerBackgroundService>());
     }

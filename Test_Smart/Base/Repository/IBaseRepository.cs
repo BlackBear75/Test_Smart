@@ -30,4 +30,6 @@ public interface IBaseRepository<TDocument> where TDocument : Document
     Task<bool> ExistsAsync(Expression<Func<TDocument, bool>> filterExpression);
     Task UpdateManyAsync(Expression<Func<TDocument, bool>> filterExpression, Action<TDocument> updateAction);
     Task DeleteManyAsync(Expression<Func<TDocument, bool>> filterExpression);
+
+    Task<TDocument> GetByIdWithIncludesAsync(Guid id, params Expression<Func<TDocument, object>>[] includes);
 }

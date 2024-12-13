@@ -151,5 +151,19 @@ public class BaseRepository<TDocument> : IBaseRepository<TDocument> where TDocum
 
         return await query.ToListAsync();
     }
+    public async Task<TDocument> GetByIdWithIncludesAsync(
+        Guid id,
+        params Expression<Func<TDocument, object>>[] includes)
+    {
+        IQueryable<TDocument> query = _context.Set<TDocument>();
+
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+
+        return await query.FirstOrDefaultAsync(e => e.Id == id);
+    }
+
 
 }

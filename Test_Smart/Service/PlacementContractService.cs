@@ -9,10 +9,13 @@ using Test_Smart.Models.PlacementContractModels;
 
 namespace Test_Smart.Service;
 
-public interface IPlacementContractService 
+public interface IPlacementContractService
 {
     Task CreateContractAsync(CreateContractRequest request);
     Task<IEnumerable<ContractResponse>> GetContractsAsync();
+    Task<ContractResponse> GetContractByIdAsync(Guid id);
+    Task UpdateContractAsync(Guid id, UpdateContractRequest request);
+    Task DeleteContractAsync(Guid id);
 }
 
 public class PlacementContractService : IPlacementContractService
@@ -36,43 +39,15 @@ public class PlacementContractService : IPlacementContractService
 
     public async Task CreateContractAsync(CreateContractRequest request)
     {
-        _loggerBackgroundService.Log("Starting CreateContractAsync process.");
+        var facility = await _facilityRepository.FindOneAsync(f => f.Code == request.ProductionFacilityCode)
+            ?? throw new InvalidOperationException("Production facility not found.");
 
-        var facility = await _facilityRepository.FindOneAsync(f => f.Code == request.ProductionFacilityCode);
-        if (facility == null)
-        {
-            var error = "Production facility not found.";
-            _loggerBackgroundService.Log($"Error: {error}");
-            throw new InvalidOperationException(error);
-        }
-
-        var equipment = await _equipmentRepository.FindOneAsync(e => e.Code == request.EquipmentTypeCode);
-        if (equipment == null)
-        {
-            var error = "Equipment type not found.";
-            _loggerBackgroundService.Log($"Error: {error}");
-            throw new InvalidOperationException(error);
-        }
+        var equipment = await _equipmentRepository.FindOneAsync(e => e.Code == request.EquipmentTypeCode)
+            ?? throw new InvalidOperationException("Equipment type not found.");
 
         var requiredArea = equipment.AreaPerUnit * request.Quantity;
 
-        var contractsInFacility = await _contractRepository.FilterByAsync(c => c.ProductionFacilityId == facility.Id);
-        var usedArea = contractsInFacility.Sum(c =>
-        {
-            if (c.EquipmentType == null)
-            {
-                _loggerBackgroundService.Log($"Warning: Contract {c.Id} has a null EquipmentType.");
-                return 0;
-            }
-            return c.Quantity * c.EquipmentType.AreaPerUnit;
-        });
-
-        if (usedArea + requiredArea > facility.StandardArea)
-        {
-            var error = "Not enough available area in the production facility.";
-            _loggerBackgroundService.Log($"Error: {error}");
-            throw new InvalidOperationException(error);
-        }
+        ValidateAreaAvailability(facility, requiredArea, null);
 
         var contract = new PlacementContract
         {
@@ -82,48 +57,80 @@ public class PlacementContractService : IPlacementContractService
         };
 
         await _contractRepository.InsertOneAsync(contract);
-
         _loggerBackgroundService.Log($"Info: Contract created successfully. Facility={facility.Name}, Equipment={equipment.Name}, Quantity={request.Quantity}");
     }
 
     public async Task<IEnumerable<ContractResponse>> GetContractsAsync()
     {
-        try
+        var contracts = await _contractRepository.GetAllWithIncludesAsync(
+            c => c.ProductionFacility,
+            c => c.EquipmentType);
+
+        return contracts.Select(c => new ContractResponse
         {
-            _loggerBackgroundService.Log("Info: Starting GetContractsAsync process.");
-
-            var contracts = await _contractRepository.GetAllWithIncludesAsync(
-                c => c.ProductionFacility,
-                c => c.EquipmentType
-            );
-
-            if (!contracts.Any())
-            {
-                _loggerBackgroundService.Log("Info: No contracts found.");
-            }
-
-            var responses = new List<ContractResponse>();
-
-            foreach (var contract in contracts)
-            {
-                var response = new ContractResponse
-                {
-                    ProductionFacilityName = contract.ProductionFacility?.Name ?? "Unknown",
-                    EquipmentTypeName = contract.EquipmentType?.Name ?? "Unknown",
-                    Quantity = contract.Quantity
-                };
-
-                responses.Add(response);
-            }
-
-            _loggerBackgroundService.Log("Info: GetContractsAsync completed successfully.");
-            return responses;
-        }
-        catch (Exception ex)
-        {
-            _loggerBackgroundService.Log($"Error: Failed to fetch contracts. {ex.Message}");
-            throw; 
-        }
+            ProductionFacilityName = c.ProductionFacility?.Name ?? "Unknown",
+            EquipmentTypeName = c.EquipmentType?.Name ?? "Unknown",
+            Quantity = c.Quantity
+        });
     }
 
+    public async Task<ContractResponse> GetContractByIdAsync(Guid id)
+    {
+        var contract = await _contractRepository.GetByIdWithIncludesAsync(
+            id,
+            c => c.ProductionFacility,
+            c => c.EquipmentType)
+            ?? throw new KeyNotFoundException("Contract not found.");
+
+        return new ContractResponse
+        {
+            ProductionFacilityName = contract.ProductionFacility?.Name ?? "Unknown",
+            EquipmentTypeName = contract.EquipmentType?.Name ?? "Unknown",
+            Quantity = contract.Quantity
+        };
+    }
+
+    public async Task UpdateContractAsync(Guid id, UpdateContractRequest request)
+    {
+        var contract = await _contractRepository.FindByIdAsync(id)
+            ?? throw new KeyNotFoundException("Contract not found.");
+
+        var facility = await _facilityRepository.FindOneAsync(f => f.Code == request.ProductionFacilityCode)
+            ?? throw new InvalidOperationException("Production facility not found.");
+
+        var equipment = await _equipmentRepository.FindOneAsync(e => e.Code == request.EquipmentTypeCode)
+            ?? throw new InvalidOperationException("Equipment type not found.");
+
+        var requiredArea = equipment.AreaPerUnit * request.Quantity;
+
+        ValidateAreaAvailability(facility, requiredArea, contract);
+
+        contract.ProductionFacilityId = facility.Id;
+        contract.EquipmentTypeId = equipment.Id;
+        contract.Quantity = request.Quantity;
+
+        await _contractRepository.UpdateOneAsync(contract);
+        _loggerBackgroundService.Log($"Info: Contract updated successfully. ID={id}");
+    }
+
+    public async Task DeleteContractAsync(Guid id)
+    {
+        var contract = await _contractRepository.FindByIdAsync(id)
+            ?? throw new KeyNotFoundException("Contract not found.");
+
+        await _contractRepository.DeleteOneAsync(id);
+        _loggerBackgroundService.Log($"Info: Contract deleted successfully. ID={id}");
+    }
+
+    private void ValidateAreaAvailability(ProductionFacility facility, double requiredArea, PlacementContract? existingContract)
+    {
+        var contractsInFacility = _contractRepository.FilterByAsync(c => c.ProductionFacilityId == facility.Id).Result;
+
+        var usedArea = contractsInFacility
+            .Where(c => existingContract == null || c.Id != existingContract.Id)
+            .Sum(c => c.Quantity * c.EquipmentType.AreaPerUnit);
+
+        if (usedArea + requiredArea > facility.StandardArea)
+            throw new InvalidOperationException("Not enough available area in the production facility.");
+    }
 }
