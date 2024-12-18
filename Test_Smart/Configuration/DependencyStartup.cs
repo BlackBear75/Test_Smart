@@ -22,9 +22,11 @@ public static class DependencyStartup
 
     private static void AddDbContext(IServiceCollection services, IConfiguration configuration)
     {
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
         services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlServer(connectionString));
     }
+
 
     private static void AddRepositories(IServiceCollection services)
     {
